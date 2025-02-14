@@ -22,7 +22,9 @@ export default function HomeScreen() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <Link href="/(parent)/Dashboard"><ThemedText type="subtitle">Parent Dashboard</ThemedText></Link>
+        <Link href="/(parent)/Dashboard" className='my-2 text-center text-blue'><ThemedText type="subtitle" className='underline text-blue font-bold'>Parent Dashboard</ThemedText></Link>
+        <Link href="/(parent)/Home" className='my-2 text-center text-blue'><ThemedText type="subtitle" className='underline text-blue font-bold'>Parent Home</ThemedText></Link>
+        <Link href="/(driver)/Map" className='my-2 text-center text-blue'><ThemedText type="subtitle" className='underline text-blue font-bold'>Driver Map</ThemedText></Link>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
           Press{' '}

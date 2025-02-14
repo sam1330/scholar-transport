@@ -3,6 +3,7 @@ import { Pressable, Text, View, Image } from 'react-native';
 import { formatDistanceToNow, addMinutes, format } from 'date-fns';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import type { StudentStatus } from '@/lib/stores/driver-store';
+import ChildLocationButton from '../driver/ChildLocationButton';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -11,6 +12,7 @@ type ChildCardProps = {
   status: StudentStatus;
   lastUpdated: string;
   onPress: () => void;
+  location: { latitude: number; longitude: number };
 };
 
 const statusConfig: Record<StudentStatus, { label: string; color: string }> = {
@@ -20,7 +22,7 @@ const statusConfig: Record<StudentStatus, { label: string; color: string }> = {
   'dropped-off': { label: 'Dropped off', color: 'bg-blue-400' },
 };
 
-export const ChildCard = ({ name, status, lastUpdated, onPress }: ChildCardProps) => {
+export const ChildCard = ({ name, status, lastUpdated, onPress, location }: ChildCardProps) => {
   const scale = useSharedValue(1);
   const formattedTime = formatDistanceToNow(new Date(lastUpdated), { addSuffix: true });
   const eta = format(addMinutes(new Date(lastUpdated), 15), 'hh:mm a');
@@ -66,6 +68,7 @@ export const ChildCard = ({ name, status, lastUpdated, onPress }: ChildCardProps
       <View className="mt-2">
         <Text className="text-gray-500">{statusConfig[status].label}</Text>
       </View>
+      <ChildLocationButton latitude={location.latitude} longitude={location.longitude} />
     </AnimatedPressable>
   );
 };

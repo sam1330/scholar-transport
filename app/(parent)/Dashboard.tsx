@@ -10,6 +10,10 @@ export default function ParentDashboard() {
     name: 'John Doe',
     status: 'waiting' as StudentStatus,
     lastUpdated: '2023-09-01T10:00:00Z',
+    location: {
+      latitude: 18.4861,
+      longitude: -69.9312
+    }
   }];
 
   const handleChildPress = (childId: number) => {};
@@ -32,6 +36,7 @@ export default function ParentDashboard() {
           status={child.status}
           lastUpdated={child.lastUpdated}
           onPress={() => handleChildPress(child.id)}
+          location={child.location}
         />
       ))}
     </View>

@@ -131,9 +131,9 @@ const AuthScreen = () => {
       // Handle authentication logic here
       console.log("Form submitted:", formData);
     }
-    if (formData.email === "parent@test.com") {
+    if (formData.email === "parent") {
       router.navigate("/(parent)");
-    } else if (formData.email === "driver@test.com") {
+    } else if (formData.email === "driver") {
       router.navigate("/(driver)");
     }
   };

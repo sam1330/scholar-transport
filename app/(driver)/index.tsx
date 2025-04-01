@@ -10,6 +10,8 @@ import {
   Platform,
   Linking,
   Alert,
+  TextInput,
+  Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -17,19 +19,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import StudentCard from "@/components/StudentCard";
 import QuickActionButton from "@/components/QuickActionButton";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from 'expo-location';
 
 const { width } = Dimensions.get("window");
 
 const DriverDashboard = () => {
   const [isOnDuty, setIsOnDuty] = useState(false);
   const [isTripActive, setIsTripActive] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const [students, setStudents] = useState([
     {
       id: "1",
       name: "Juan Perez",
       address: "Calle francisco Javier",
-      coordinates: { latitude: 18.49314601243193, longitude: -69.74738174232722 },
+      coordinates: {
+        latitude: 18.49314601243193,
+        longitude: -69.74738174232722,
+      },
       distance: 2.5,
       status: "waiting",
       pickupTime: "7:45 AM",
@@ -38,7 +46,10 @@ const DriverDashboard = () => {
       id: "2",
       name: "Mario Rodriguez",
       address: "Calle A. #22 Res. Nuevo amanecer",
-      coordinates: { latitude: 18.490347582369107, longitude: -69.80865863031364 },
+      coordinates: {
+        latitude: 18.490347582369107,
+        longitude: -69.80865863031364,
+      },
       distance: 1.8,
       status: "waiting",
       pickupTime: "7:55 AM",
@@ -47,7 +58,10 @@ const DriverDashboard = () => {
       id: "3",
       name: "Maria Gomez",
       address: "Calle Claudio Peña #15",
-      coordinates: { latitude: 18.486849365677216, longitude: -69.83232845140589 },
+      coordinates: {
+        latitude: 18.486849365677216,
+        longitude: -69.83232845140589,
+      },
       distance: 3.2,
       status: "waiting",
       pickupTime: "8:05 AM",
@@ -76,7 +90,109 @@ const DriverDashboard = () => {
     temperature: "24°C",
     condition: "Soleado",
   });
-  const startTrip = () => {
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [problem, setProblem] = useState("");
+
+  const [errors, setErrors] = useState([]);
+
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [locationSubscription, setLocationSubscription] = useState<Location.LocationSubscription | null>(null);
+
+  const handleReport = async () => {
+    if (!problem.trim()) return alert("Please describe the problem.");
+
+    try {
+      // Create notification for parents
+      const notification = {
+        id: Date.now().toString(),
+        title: 'Problem Reported by Driver',
+        message: problem,
+        timestamp: new Date().toLocaleString(),
+        read: false,
+        type: 'problem' as const,
+        driver: 'Samuel Martinez',
+        vehicle: 'Toyota Hiace',
+      };
+
+      // Get existing notifications
+      const existingNotifications = await AsyncStorage.getItem('parent_notifications');
+      const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
+      
+      // Add new notification
+      notifications.unshift(notification);
+      
+      // Save updated notifications
+      await AsyncStorage.setItem('parent_notifications', JSON.stringify(notifications));
+
+      // Also save to alerts for driver's view
+      const prevAlerts = JSON.parse(await AsyncStorage.getItem("alerts") || "[]");
+      await AsyncStorage.setItem("alerts", JSON.stringify([problem, ...prevAlerts]));
+
+      // Show success message
+      alert("Problem reported successfully");
+      setProblem("");
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Error reporting problem:', error);
+      alert('Failed to report problem. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    (async () =>
+      await AsyncStorage.getItem("alerts").then((alerts) =>
+        setErrors(JSON.parse(alerts || "[]"))
+      ))();
+  }, []);
+
+  useEffect(() => {
+    const startLocationTracking = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Location permission is required for trip tracking.');
+          return;
+        }
+
+        const subscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            timeInterval: 5000,
+            distanceInterval: 10,
+          },
+          async (newLocation) => {
+            setLocation(newLocation);
+            // Store location for parent app to access
+            await AsyncStorage.setItem('driver_location', JSON.stringify({
+              latitude: newLocation.coords.latitude,
+              longitude: newLocation.coords.longitude,
+              timestamp: new Date().toLocaleString(),
+            }));
+          }
+        );
+
+        setLocationSubscription(subscription);
+      } catch (error) {
+        console.error('Error starting location tracking:', error);
+      }
+    };
+
+    if (isTripActive) {
+      startLocationTracking();
+    } else if (locationSubscription) {
+      locationSubscription.remove();
+      setLocationSubscription(null);
+    }
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
+  }, [isTripActive]);
+
+  const startTrip = async () => {
     if (!isOnDuty) {
       Alert.alert(
         "Advertencia",
@@ -99,43 +215,49 @@ const DriverDashboard = () => {
 
     setIsTripActive(true);
     setCurrentTrip((prev) => ({
-        ...prev,
-        status: "In Progress",
-        startTime: new Date(),
-        nextStop: sortedStudents[0]?.address || "No hay paradas restantes",
-        studentsPickedUp: students.filter((s) => s.status === "picked_up").length,
-      }));
+      ...prev,
+      status: "In Progress",
+      startTime: new Date(),
+      nextStop: sortedStudents[0]?.address || "No hay paradas restantes",
+      studentsPickedUp: students.filter((s) => s.status === "picked_up").length,
+    }));
   };
 
   const endTrip = () => {
-    Alert.alert("Terminar viaje", "¿Estás seguro de que deseas terminar el viaje?", [
-      {
-        text: "Cancelar",
-        style: "cancel",
-      },
-      {
-        text: "Terminar",
-        onPress: () => {
-          setIsTripActive(false);
-          setCurrentTrip({
-            status: "No Iniciado",
-            studentsPickedUp: 0,
-            totalStudents: students.length,
-            nextStop: "",
-            estimatedTime: "",
-            startTime: null,
-            endTime: new Date(),
-          });
-          // Reset all students for next trip
-          setStudents((prev) =>
-            prev.map((student) => ({
-              ...student,
-              status: "waiting",
-            }))
-          );
+    Alert.alert(
+      "Terminar viaje",
+      "¿Estás seguro de que deseas terminar el viaje?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "Terminar",
+          onPress: async () => {
+            setIsTripActive(false);
+            setCurrentTrip({
+              status: "No Iniciado",
+              studentsPickedUp: 0,
+              totalStudents: students.length,
+              nextStop: "",
+              estimatedTime: "",
+              startTime: null,
+              endTime: new Date(),
+            });
+            // Reset all students for next trip
+            setStudents((prev) =>
+              prev.map((student) => ({
+                ...student,
+                status: "waiting",
+              }))
+            );
+            // Clear stored location when trip ends
+            await AsyncStorage.removeItem('driver_location');
+          },
+        },
+      ]
+    );
   };
 
   const markStudentAsPickedUp = (studentId: string) => {
@@ -154,15 +276,36 @@ const DriverDashboard = () => {
     }));
   };
 
+  const handleLogout = () => {
+    // Add any logout logic here
+    router.replace("/(auth)");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header Section */}
         <LinearGradient colors={["#4a90e2", "#357abd"]} style={styles.header}>
           <View style={styles.headerTop}>
-            <View>
+          <View>
               <Text style={styles.welcomeText}>Bienvenido de vuelta</Text>
               <Text style={styles.driverName}>Samuel Martinez</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowProfileMenu(true)}
+              style={styles.profileButton}
+            >
+              <MaterialIcons name="account-circle" size={40} color="white" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.headerBottom}>
+            
+            <View style={styles.weatherWidget}>
+              <Ionicons name="sunny" size={24} color="#FFF" />
+              <Text style={styles.weatherText}>
+                {weatherInfo.temperature} • {weatherInfo.condition}
+              </Text>
             </View>
             <View style={styles.dutySwitch}>
               <Text style={styles.dutyText}>
@@ -176,14 +319,41 @@ const DriverDashboard = () => {
               />
             </View>
           </View>
-
-          <View style={styles.weatherWidget}>
-            <Ionicons name="sunny" size={24} color="#FFF" />
-            <Text style={styles.weatherText}>
-              {weatherInfo.temperature} • {weatherInfo.condition}
-            </Text>
-          </View>
         </LinearGradient>
+
+        {/* Profile Menu Modal */}
+        <Modal
+          visible={showProfileMenu}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowProfileMenu(false)}
+        >
+          <TouchableOpacity
+            className="flex-1 bg-black/50"
+            activeOpacity={1}
+            onPress={() => setShowProfileMenu(false)}
+          >
+            <View className="absolute right-4 top-16 bg-white rounded-lg shadow-lg w-48">
+              <TouchableOpacity
+                className="flex-row items-center p-4 border-b border-gray-200"
+                onPress={() => {
+                  setShowProfileMenu(false);
+                  // Add settings navigation logic here
+                }}
+              >
+                <MaterialIcons name="settings" size={24} color="#4a90e2" />
+                <Text className="ml-3 text-gray-800">Settings</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-row items-center p-4"
+                onPress={handleLogout}
+              >
+                <MaterialIcons name="logout" size={24} color="#FF3B30" />
+                <Text className="ml-3 text-red-500">Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
         {/* Trip Status Section */}
         <View style={styles.tripStatus}>
@@ -222,22 +392,24 @@ const DriverDashboard = () => {
               disabled={!isOnDuty}
             />
             <QuickActionButton
-              icon={<MaterialIcons name="message" size={24} color="#FFF" />}
+              icon={<MaterialIcons name="chat" size={24} color="#FFF" />}
               label="Chat"
               color="#FF9800"
-              onPress={() => {}}
+              onPress={() => router.push("/(driver)/chat")}
             />
             <QuickActionButton
               icon={<MaterialIcons name="warning" size={24} color="#FFF" />}
               label="Reportar Problema"
               color="#F44336"
-              onPress={() => {}}
+              onPress={() => setModalVisible(true)}
             />
             <QuickActionButton
               icon={<MaterialIcons name="people" size={24} color="#FFF" />}
               label="Ver estudiantes"
               color="#2196F3"
-              onPress={() => {router.push("/(driver)/StudentList")}}
+              onPress={() => {
+                router.push("/(driver)/StudentList");
+              }}
             />
           </View>
         </View>
@@ -275,6 +447,48 @@ const DriverDashboard = () => {
               ))}
           </View>
         )}
+
+        {/* Modal */}
+        <Modal
+          animationType="slide"
+          transparent
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <View className="bg-white w-11/12 p-5 rounded-xl shadow-lg">
+              <Text className="text-lg font-bold text-gray-800">
+                Reportar un Problema
+              </Text>
+
+              {/* Input */}
+              <TextInput
+                className="border border-gray-300 p-3 rounded-md mt-4"
+                placeholder="Describe el problema..."
+                multiline
+                value={problem}
+                onChangeText={setProblem}
+              />
+
+              {/* Buttons */}
+              <View className="flex-row justify-end mt-4">
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  className="px-4 py-2 mr-2 bg-gray-300 rounded-md"
+                >
+                  <Text className="text-gray-700">Cancelar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleReport}
+                  className="px-4 py-2 bg-blue-500 rounded-md"
+                >
+                  <Text className="text-white font-semibold">Reportar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -313,15 +527,24 @@ const styles = StyleSheet.create({
     color: "#FFF",
     marginRight: 8,
   },
+  headerBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
   weatherWidget: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 0,
   },
   weatherText: {
     color: "#FFF",
     marginLeft: 8,
     fontSize: 16,
+  },
+  profileButton: {
+    padding: 8,
   },
   tripStatus: {
     padding: 20,

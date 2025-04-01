@@ -72,7 +72,7 @@ const Index = () => {
                 className="flex-row items-center p-4 border-b border-gray-200"
                 onPress={() => {
                   setShowProfileMenu(false);
-                  // Add settings navigation logic here
+                  router.push('/settings');
                 }}
               >
                 <MaterialIcons name="settings" size={24} color="#4a90e2" />
@@ -133,10 +133,10 @@ const Index = () => {
               onPress={() => setShowAbsenceModal(true)} 
             />
             <QuickActionButton 
-              icon={<FontAwesome5 name="route" size={24} color="white" />} 
-              label="View Route" 
-              color="#34C759" 
-              onPress={() => {}} 
+              icon={<MaterialIcons name="notifications" size={24} color="white" />} 
+              label="Notifications" 
+              color="#FF9500" 
+              onPress={() => router.push('/notifications')} 
             />
             <QuickActionButton 
               icon={<MaterialIcons name="history" size={24} color="white" />} 
@@ -177,4 +177,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Index; 

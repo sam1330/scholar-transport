@@ -6,6 +6,7 @@ const DriverLayout = () => {
             <Stack.Screen name="index" />
             <Stack.Screen name="Map" />
             <Stack.Screen name="StudentList" />
+            <Stack.Screen name="chat" />
         </Stack>
     );
 };

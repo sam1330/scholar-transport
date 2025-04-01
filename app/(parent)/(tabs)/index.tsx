@@ -10,11 +10,11 @@ import {
   Dimensions,
   Modal,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import QuickActionButton from '@/components/QuickActionButton';
 import AbsenceReportModal from '@/components/AbsenceReportModal';
+import ParentHeader from '@/components/ParentHeader';
 import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
@@ -25,7 +25,6 @@ const Index = () => {
     eta: '10 mins',
     location: 'On Main Street',
   });
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showAbsenceModal, setShowAbsenceModal] = useState(false);
 
   // Mock data for students - in a real app, this would come from an API or database
@@ -34,61 +33,10 @@ const Index = () => {
     { id: '2', name: 'Sarah Smith', grade: '8' },
   ];
 
-  const handleLogout = () => {
-    // Add any logout logic here
-    router.replace('/(auth)');
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
+      <ParentHeader />
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <LinearGradient colors={["#4a90e2", "#357abd"]} className="p-5 rounded-b-2xl">
-          <View className="flex-row justify-between items-center">
-            <View>
-              <Text className="text-white text-base opacity-90">Good Morning</Text>
-              <Text className="text-white text-2xl font-bold">John's Parent</Text>
-            </View>
-            <TouchableOpacity className="p-2" onPress={() => setShowProfileMenu(true)}>
-              <MaterialIcons name="account-circle" size={40} color="white" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-
-        {/* Profile Menu Modal */}
-        <Modal
-          visible={showProfileMenu}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowProfileMenu(false)}
-        >
-          <TouchableOpacity 
-            className="flex-1 bg-black/50" 
-            activeOpacity={1} 
-            onPress={() => setShowProfileMenu(false)}
-          >
-            <View className="absolute right-4 top-16 bg-white rounded-lg shadow-lg w-48">
-              <TouchableOpacity 
-                className="flex-row items-center p-4 border-b border-gray-200"
-                onPress={() => {
-                  setShowProfileMenu(false);
-                  router.push('/settings');
-                }}
-              >
-                <MaterialIcons name="settings" size={24} color="#4a90e2" />
-                <Text className="ml-3 text-gray-800">Settings</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                className="flex-row items-center p-4"
-                onPress={handleLogout}
-              >
-                <MaterialIcons name="logout" size={24} color="#FF3B30" />
-                <Text className="ml-3 text-red-500">Logout</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-
         {/* Live Tracking Card */}
         <View className="bg-white mx-4 my-4 p-4 rounded-xl shadow-lg">
           <View className="flex-row justify-between items-center mb-4">
@@ -133,10 +81,10 @@ const Index = () => {
               onPress={() => setShowAbsenceModal(true)} 
             />
             <QuickActionButton 
-              icon={<MaterialIcons name="notifications" size={24} color="white" />} 
-              label="Notifications" 
-              color="#FF9500" 
-              onPress={() => router.push('/notifications')} 
+              icon={<FontAwesome5 name="route" size={24} color="white" />} 
+              label="View Route" 
+              color="#34C759" 
+              onPress={() => router.push('/route')} 
             />
             <QuickActionButton 
               icon={<MaterialIcons name="history" size={24} color="white" />} 

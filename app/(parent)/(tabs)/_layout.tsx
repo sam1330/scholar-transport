@@ -1,21 +1,20 @@
 import { Tabs } from 'expo-router';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
-export default function TabsLayout() {
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        tabBarActiveTintColor: '#4a90e2',
+        tabBarInactiveTintColor: '#8e8e93',
         tabBarStyle: {
           backgroundColor: 'white',
           borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
+          borderTopColor: '#e5e5ea',
+          paddingBottom: 5,
+          paddingTop: 5,
         },
-        tabBarActiveTintColor: '#4a90e2',
-        tabBarInactiveTintColor: '#6B7280',
+        headerShown: false,
       }}
     >
       <Tabs.Screen
@@ -41,7 +40,7 @@ export default function TabsLayout() {
         options={{
           title: 'Notifications',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="notifications-outline" size={size} color={color} />
+            <MaterialIcons name="notifications" size={size} color={color} />
           ),
         }}
       />

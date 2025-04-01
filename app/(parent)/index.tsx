@@ -49,9 +49,17 @@ const Index = () => {
               <Text className="text-white text-base opacity-90">Good Morning</Text>
               <Text className="text-white text-2xl font-bold">John's Parent</Text>
             </View>
-            <TouchableOpacity className="p-2" onPress={() => setShowProfileMenu(true)}>
-              <MaterialIcons name="account-circle" size={40} color="white" />
-            </TouchableOpacity>
+            <View className="flex-row items-center">
+              <TouchableOpacity 
+                className="p-2 mr-2" 
+                onPress={() => router.push('/notifications')}
+              >
+                <MaterialIcons name="notifications" size={28} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity className="p-2" onPress={() => setShowProfileMenu(true)}>
+                <MaterialIcons name="account-circle" size={40} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         </LinearGradient>
 
@@ -136,7 +144,7 @@ const Index = () => {
               icon={<FontAwesome5 name="route" size={24} color="white" />} 
               label="View Route" 
               color="#34C759" 
-              onPress={() => {}} 
+              onPress={() => router.push('/route')} 
             />
             <QuickActionButton 
               icon={<MaterialIcons name="history" size={24} color="white" />} 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import QuickActionButton from '@/components/QuickActionButton';
 import AbsenceReportModal from '@/components/AbsenceReportModal';
 import { router } from 'expo-router';
+import { registerForPushNotificationsAsync } from '@/utils/notifications';
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +36,11 @@ const Index = () => {
     { id: '1', name: 'Juan Pérez', grade: '10' },
     { id: '2', name: 'Ana García', grade: '8' },
   ];
+
+  useEffect(() => {
+    // Register for push notifications when the app starts
+    registerForPushNotificationsAsync();
+  }, []);
 
   const handleLogout = () => {
     // Add any logout logic here

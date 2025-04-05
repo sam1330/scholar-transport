@@ -21,6 +21,7 @@ import QuickActionButton from "@/components/QuickActionButton";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
+import { sendDropoffNotification, sendProblemNotification } from '@/utils/notifications';
 
 const { width } = Dimensions.get("window");
 
@@ -104,30 +105,37 @@ const DriverDashboard = () => {
 
     try {
       // Create notification for parents
-      const notification = {
-        id: Date.now().toString(),
-        title: 'Problema Reportado por el Conductor',
-        message: problem,
-        timestamp: new Date().toLocaleString(),
-        read: false,
-        type: 'problem' as const,
-        driver: 'Samuel Martinez',
-        vehicle: 'Toyota Hiace',
-      };
+      // const notification = {
+      //   id: Date.now().toString(),
+      //   title: 'Problema Reportado por el Conductor',
+      //   message: problem,
+      //   timestamp: new Date().toLocaleString(),
+      //   read: false,
+      //   type: 'problem' as const,
+      //   driver: 'Samuel Martinez',
+      //   vehicle: 'Toyota Hiace',
+      // };
 
-      // Get existing notifications
-      const existingNotifications = await AsyncStorage.getItem('parent_notifications');
-      const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
+      // // Get existing notifications
+      // const existingNotifications = await AsyncStorage.getItem('parent_notifications');
+      // const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
       
-      // Add new notification
-      notifications.unshift(notification);
+      // // Add new notification
+      // notifications.unshift(notification);
       
-      // Save updated notifications
-      await AsyncStorage.setItem('parent_notifications', JSON.stringify(notifications));
+      // // Save updated notifications
+      // await AsyncStorage.setItem('parent_notifications', JSON.stringify(notifications));
 
-      // Also save to alerts for driver's view
-      const prevAlerts = JSON.parse(await AsyncStorage.getItem("alerts") || "[]");
-      await AsyncStorage.setItem("alerts", JSON.stringify([problem, ...prevAlerts]));
+      // // Also save to alerts for driver's view
+      // const prevAlerts = JSON.parse(await AsyncStorage.getItem("alerts") || "[]");
+      // await AsyncStorage.setItem("alerts", JSON.stringify([problem, ...prevAlerts]));
+
+      // Send notification for the reported problem
+      await sendProblemNotification(
+        problem,
+        "Samuel Martínez",
+        "Toyota Hiace"
+      );
 
       // Show success message
       alert("Problema reportado exitosamente");
@@ -260,7 +268,10 @@ const DriverDashboard = () => {
     );
   };
 
-  const markStudentAsPickedUp = (studentId: string) => {
+  const markStudentAsPickedUp = async (studentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+
     setStudents((prev) =>
       prev.map((student) =>
         student.id === studentId ? { ...student, status: "picked_up" } : student
@@ -274,6 +285,13 @@ const DriverDashboard = () => {
         students.find((s) => s.status === "waiting" && s.id !== studentId)
           ?.address || "School",
     }));
+
+    // Send notification when student is picked up
+    await sendDropoffNotification(
+      student.name,
+      "Samuel Martínez",
+      "Toyota Hiace"
+    );
   };
 
   const handleLogout = () => {

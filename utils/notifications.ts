@@ -109,6 +109,32 @@ export const sendDropoffNotification = async (studentName: string, driverName: s
   return notificationId;
 };
 
+// Send dropoff at destination notification
+export const sendDropoffAtDestinationNotification = async (studentName: string, driverName: string, vehicle: string, destination: string) => {
+  const notificationId = Date.now().toString();
+  const timestamp = new Date().toLocaleString();
+  
+  // Save to AsyncStorage
+  await saveNotification({
+    id: notificationId,
+    title: 'Estudiante Entregado',
+    message: `${studentName} ha sido entregado en ${destination} por ${driverName} en el vehículo ${vehicle}`,
+    timestamp,
+    read: false,
+    type: 'dropoff',
+    driver: driverName,
+    vehicle,
+  });
+  
+  // Send local notification
+  await sendLocalNotification(
+    'Estudiante Entregado',
+    `${studentName} ha sido entregado en ${destination} por ${driverName} en el vehículo ${vehicle}`
+  );
+  
+  return notificationId;
+};
+
 // Send problem notification
 export const sendProblemNotification = async (problem: string, driverName: string, vehicle: string) => {
   const notificationId = Date.now().toString();

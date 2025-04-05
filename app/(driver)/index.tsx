@@ -21,7 +21,7 @@ import QuickActionButton from "@/components/QuickActionButton";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
-import { sendDropoffNotification, sendProblemNotification } from '@/utils/notifications';
+import { sendDropoffNotification, sendProblemNotification, sendDropoffAtDestinationNotification } from '@/utils/notifications';
 
 const { width } = Dimensions.get("window");
 
@@ -33,7 +33,7 @@ const DriverDashboard = () => {
   const [students, setStudents] = useState([
     {
       id: "1",
-      name: "Juan Perez",
+      name: "Juan Pérez",
       address: "Calle francisco Javier",
       coordinates: {
         latitude: 18.49314601243193,
@@ -42,10 +42,11 @@ const DriverDashboard = () => {
       distance: 2.5,
       status: "waiting",
       pickupTime: "7:45 AM",
+      isPickup: true,
     },
     {
       id: "2",
-      name: "Mario Rodriguez",
+      name: "Mario Rodríguez",
       address: "Calle A. #22 Res. Nuevo amanecer",
       coordinates: {
         latitude: 18.490347582369107,
@@ -54,10 +55,11 @@ const DriverDashboard = () => {
       distance: 1.8,
       status: "waiting",
       pickupTime: "7:55 AM",
+      isPickup: true,
     },
     {
       id: "3",
-      name: "Maria Gomez",
+      name: "María Gómez",
       address: "Calle Claudio Peña #15",
       coordinates: {
         latitude: 18.486849365677216,
@@ -66,6 +68,33 @@ const DriverDashboard = () => {
       distance: 3.2,
       status: "waiting",
       pickupTime: "8:05 AM",
+      isPickup: true,
+    },
+    {
+      id: "4",
+      name: "Carlos López",
+      address: "Escuela San José",
+      coordinates: {
+        latitude: 18.486849365677216,
+        longitude: -69.83232845140589,
+      },
+      distance: 0,
+      status: "picked_up",
+      pickupTime: "8:30 AM",
+      isPickup: false,
+    },
+    {
+      id: "5",
+      name: "Ana Torres",
+      address: "Escuela San José",
+      coordinates: {
+        latitude: 18.486849365677216,
+        longitude: -69.83232845140589,
+      },
+      distance: 0,
+      status: "picked_up",
+      pickupTime: "8:30 AM",
+      isPickup: false,
     },
   ]);
 
@@ -294,6 +323,25 @@ const DriverDashboard = () => {
     );
   };
 
+  const markStudentAsDroppedOff = async (studentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === studentId ? { ...student, status: "dropped_off" } : student
+      )
+    );
+
+    // Send notification when student is dropped off
+    await sendDropoffAtDestinationNotification(
+      student.name,
+      "Samuel Martínez",
+      "Toyota Hiace",
+      student.address
+    );
+  };
+
   const handleLogout = () => {
     // Add any logout logic here
     router.replace("/(auth)");
@@ -453,14 +501,65 @@ const DriverDashboard = () => {
           <View style={styles.completedPickups}>
             <Text style={styles.sectionTitle}>Recogidos</Text>
             {students
-              .filter((student) => student.status === "picked_up")
+              .filter((student) => student.status === "picked_up" || student.status === "dropped_off")
               .map((student) => (
-                <StudentCard
-                  key={student.id}
-                  student={student}
-                  markStudentAsPickedUp={markStudentAsPickedUp}
-                  isTripActive
-                />
+                <View key={student.id} style={styles.studentCard}>
+                  <View style={styles.studentInfo}>
+                    <FontAwesome5 name="user-graduate" size={24} color="#4a90e2" />
+                    <View style={styles.studentDetails}>
+                      <Text style={styles.studentName}>{student.name}</Text>
+                      <Text style={styles.studentAddress}>{student.address}</Text>
+                      <Text style={styles.studentDistance}>
+                        {student.isPickup ? "Recogida" : "Entrega"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.studentActions}>
+                    {student.status === "picked_up" ? (
+                      student.isPickup ? (
+                        <TouchableOpacity
+                          style={styles.pickupButton}
+                          onPress={() => markStudentAsPickedUp(student.id)}
+                        >
+                          <Text style={{ color: "white", fontWeight: "600" }}>
+                            Recogido
+                          </Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          style={[styles.pickupButton, { backgroundColor: "#FF9500" }]}
+                          onPress={() => markStudentAsDroppedOff(student.id)}
+                        >
+                          <Text style={{ color: "white", fontWeight: "600" }}>
+                            Entregado
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    ) : (
+                      <View style={[styles.pickupButton, { backgroundColor: "#4a90e2" }]}>
+                        <Text style={{ color: "white", fontWeight: "600" }}>
+                          Completado
+                        </Text>
+                      </View>
+                    )}
+                    <TouchableOpacity
+                      style={styles.navigationButton}
+                      onPress={() => {
+                        // Open maps with student location
+                        const { latitude, longitude } = student.coordinates;
+                        const url = Platform.select({
+                          ios: `maps:${latitude},${longitude}?q=${student.address}`,
+                          android: `geo:${latitude},${longitude}?q=${student.address}`,
+                        });
+                        if (url) {
+                          Linking.openURL(url);
+                        }
+                      }}
+                    >
+                      <MaterialIcons name="directions" size={24} color="#4a90e2" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
               ))}
           </View>
         )}

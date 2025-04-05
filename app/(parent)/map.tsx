@@ -30,7 +30,7 @@ const MapScreen = () => {
   const [driverInfo, setDriverInfo] = useState<DriverInfo>({
     name: 'Samuel Martinez',
     vehicleInfo: 'Toyota Hiace',
-    status: 'In Transit',
+    status: 'En Tránsito',
     eta: '10 mins',
   });
 
@@ -59,7 +59,7 @@ const MapScreen = () => {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="#4a90e2" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Live Tracking</Text>
+        <Text style={styles.headerTitle}>Seguimiento en Vivo</Text>
       </View>
 
       <MapView
@@ -94,15 +94,15 @@ const MapScreen = () => {
         <View style={styles.statusInfo}>
           <View style={styles.statusItem}>
             <MaterialIcons name="access-time" size={24} color="#4a90e2" />
-            <Text style={styles.statusText}>ETA: {driverInfo.eta}</Text>
+            <Text style={styles.statusText}>Tiempo estimado: {driverInfo.eta}</Text>
           </View>
           <View style={styles.statusItem}>
             <MaterialIcons name="info" size={24} color="#4a90e2" />
-            <Text style={styles.statusText}>Status: {driverInfo.status}</Text>
+            <Text style={styles.statusText}>Estado: {driverInfo.status}</Text>
           </View>
         </View>
         <Text style={styles.lastUpdate}>
-          Last updated: {driverLocation.timestamp}
+          Última actualización: {driverLocation.timestamp}
         </Text>
       </View>
     </SafeAreaView>

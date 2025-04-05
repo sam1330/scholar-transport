@@ -6,6 +6,8 @@ export default function ParentLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="route" />
       <Stack.Screen name="map" />
+      <Stack.Screen name="settings" />
+      <Stack.Screen name="travel-history" />
     </Stack>
   );
 }

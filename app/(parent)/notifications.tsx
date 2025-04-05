@@ -66,10 +66,10 @@ const NotificationItem = ({ notification, onPress }: { notification: Notificatio
           {notification.type === 'problem' && (
             <View className="mt-2 bg-red-50 p-2 rounded-lg">
               <Text className="text-red-600 text-sm">
-                Driver: {notification.driver}
+                Conductor: {notification.driver}
               </Text>
               <Text className="text-red-600 text-sm">
-                Vehicle: {notification.vehicle}
+                Vehículo: {notification.vehicle}
               </Text>
             </View>
           )}
@@ -84,7 +84,32 @@ const NotificationItem = ({ notification, onPress }: { notification: Notificatio
 };
 
 const NotificationsScreen = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: '1',
+      title: 'Llegada a la Escuela',
+      message: 'El autobús ha llegado a la escuela',
+      timestamp: '8:30 AM',
+      read: false,
+      type: 'arrival',
+    },
+    {
+      id: '2',
+      title: 'Retraso en la Ruta',
+      message: 'El autobús llegará 15 minutos tarde debido al tráfico',
+      timestamp: '8:15 AM',
+      read: true,
+      type: 'delay',
+    },
+    {
+      id: '3',
+      title: 'Reporte de Ausencia',
+      message: 'John no asistirá hoy',
+      timestamp: '7:45 AM',
+      read: true,
+      type: 'absence',
+    },
+  ]);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadNotifications = async () => {
@@ -127,7 +152,7 @@ const NotificationsScreen = () => {
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <MaterialIcons name="arrow-back" size={24} color="#4a90e2" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-800">Notifications</Text>
+        <Text className="text-xl font-bold text-gray-800">Notificaciones</Text>
       </View>
 
       {/* Notifications List */}
@@ -146,7 +171,7 @@ const NotificationsScreen = () => {
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center p-4">
             <MaterialIcons name="notifications-none" size={48} color="#ccc" />
-            <Text className="text-gray-500 mt-2">No notifications yet</Text>
+            <Text className="text-gray-500 mt-2">No hay notificaciones</Text>
           </View>
         }
       />

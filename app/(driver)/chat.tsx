@@ -37,17 +37,17 @@ const ChatScreen = () => {
   const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: '1',
-      parentName: "John's Parent",
+      parentName: "Padre de John",
       studentName: 'John Smith',
-      lastMessage: 'Will John be attending today?',
+      lastMessage: '¿John asistirá hoy?',
       timestamp: '10:30 AM',
       unreadCount: 1,
     },
     {
       id: '2',
-      parentName: "Sarah's Parent",
+      parentName: "Padre de Sarah",
       studentName: 'Sarah Johnson',
-      lastMessage: 'Thank you for the update',
+      lastMessage: 'Gracias por la actualización',
       timestamp: '9:45 AM',
       unreadCount: 0,
     },
@@ -158,7 +158,7 @@ const ChatScreen = () => {
               <TouchableOpacity onPress={() => router.back()} className="mr-3">
                 <MaterialIcons name="arrow-back" size={24} color="#4a90e2" />
               </TouchableOpacity>
-              <Text className="text-xl font-bold text-gray-800">Messages</Text>
+              <Text className="text-xl font-bold text-gray-800">Mensajes</Text>
             </View>
             <FlatList
               data={conversations}
@@ -200,7 +200,7 @@ const ChatScreen = () => {
               <TextInput
                 value={message}
                 onChangeText={setMessage}
-                placeholder="Type a message..."
+                placeholder="Escribe un mensaje..."
                 className="flex-1 bg-gray-100 rounded-full px-4 py-2 mr-2"
               />
               <TouchableOpacity

@@ -36,9 +36,9 @@ const ChatScreen = () => {
   const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: '1',
-      driverName: 'Michael Johnson',
+      driverName: 'Samuel Martinez',
       driverImage: 'https://api.a0.dev/assets/image?text=professional%20driver%20portrait&aspect=1:1',
-      lastMessage: 'We are arriving in 5 minutes',
+      lastMessage: 'Llegando en 10 minutos.',
       timestamp: '10:30 AM',
       unreadCount: 2,
     },
@@ -145,7 +145,7 @@ const ChatScreen = () => {
         {!selectedConversation ? (
           <>
             <View className="p-4 border-b border-gray-200">
-              <Text className="text-xl font-bold text-gray-800">Messages</Text>
+              <Text className="text-xl font-bold text-gray-800">Mensajes</Text>
             </View>
             <FlatList
               data={conversations}
@@ -188,7 +188,7 @@ const ChatScreen = () => {
               <TextInput
                 value={message}
                 onChangeText={setMessage}
-                placeholder="Type a message..."
+                placeholder="Escribe un mensaje..."
                 className="flex-1 bg-gray-100 rounded-full px-4 py-2 mr-2"
               />
               <TouchableOpacity

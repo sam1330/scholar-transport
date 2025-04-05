@@ -77,7 +77,7 @@ const DriverDashboard = () => {
     startTime: Date | null;
     endTime: Date | null;
   }>({
-    status: "Not Started",
+    status: "No Iniciado",
     studentsPickedUp: 0,
     totalStudents: 3,
     nextStop: "",
@@ -100,13 +100,13 @@ const DriverDashboard = () => {
   const [locationSubscription, setLocationSubscription] = useState<Location.LocationSubscription | null>(null);
 
   const handleReport = async () => {
-    if (!problem.trim()) return alert("Please describe the problem.");
+    if (!problem.trim()) return alert("Por favor describe el problema.");
 
     try {
       // Create notification for parents
       const notification = {
         id: Date.now().toString(),
-        title: 'Problem Reported by Driver',
+        title: 'Problema Reportado por el Conductor',
         message: problem,
         timestamp: new Date().toLocaleString(),
         read: false,
@@ -130,12 +130,12 @@ const DriverDashboard = () => {
       await AsyncStorage.setItem("alerts", JSON.stringify([problem, ...prevAlerts]));
 
       // Show success message
-      alert("Problem reported successfully");
+      alert("Problema reportado exitosamente");
       setProblem("");
       setModalVisible(false);
     } catch (error) {
       console.error('Error reporting problem:', error);
-      alert('Failed to report problem. Please try again.');
+      alert('Error al reportar el problema. Por favor intenta de nuevo.');
     }
   };
 
@@ -216,7 +216,7 @@ const DriverDashboard = () => {
     setIsTripActive(true);
     setCurrentTrip((prev) => ({
       ...prev,
-      status: "In Progress",
+      status: "En Progreso",
       startTime: new Date(),
       nextStop: sortedStudents[0]?.address || "No hay paradas restantes",
       studentsPickedUp: students.filter((s) => s.status === "picked_up").length,
@@ -287,7 +287,7 @@ const DriverDashboard = () => {
         {/* Header Section */}
         <LinearGradient colors={["#4a90e2", "#357abd"]} style={styles.header}>
           <View style={styles.headerTop}>
-          <View>
+            <View>
               <Text style={styles.welcomeText}>Bienvenido de vuelta</Text>
               <Text style={styles.driverName}>Samuel Martinez</Text>
             </View>
@@ -300,7 +300,6 @@ const DriverDashboard = () => {
           </View>
 
           <View style={styles.headerBottom}>
-            
             <View style={styles.weatherWidget}>
               <Ionicons name="sunny" size={24} color="#FFF" />
               <Text style={styles.weatherText}>
@@ -338,18 +337,18 @@ const DriverDashboard = () => {
                 className="flex-row items-center p-4 border-b border-gray-200"
                 onPress={() => {
                   setShowProfileMenu(false);
-                  // Add settings navigation logic here
+                  router.push('/settings');
                 }}
               >
                 <MaterialIcons name="settings" size={24} color="#4a90e2" />
-                <Text className="ml-3 text-gray-800">Settings</Text>
+                <Text className="ml-3 text-gray-800">Configuración</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex-row items-center p-4"
                 onPress={handleLogout}
               >
                 <MaterialIcons name="logout" size={24} color="#FF3B30" />
-                <Text className="ml-3 text-red-500">Logout</Text>
+                <Text className="ml-3 text-red-500">Cerrar Sesión</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -357,19 +356,19 @@ const DriverDashboard = () => {
 
         {/* Trip Status Section */}
         <View style={styles.tripStatus}>
-          <Text style={styles.sectionTitle}>Status del viaje</Text>
+          <Text style={styles.sectionTitle}>Estado del viaje</Text>
           <View style={styles.tripStatsContainer}>
             <View style={styles.tripStat}>
               <Text style={styles.statNumber}>
                 {currentTrip.studentsPickedUp}
               </Text>
-              <Text style={styles.statLabel}>Recogido</Text>
+              <Text style={styles.statLabel}>Recogidos</Text>
             </View>
             <View style={styles.tripStat}>
               <Text style={styles.statNumber}>
                 {students.filter((s) => s.status === "waiting").length}
               </Text>
-              <Text style={styles.statLabel}>Restante</Text>
+              <Text style={styles.statLabel}>Restantes</Text>
             </View>
             <View style={styles.tripStat}>
               <Text style={styles.statNumber}>{students.length}</Text>
@@ -380,7 +379,7 @@ const DriverDashboard = () => {
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
-          <Text style={styles.sectionTitle}>Acciones rápidas</Text>
+          <Text style={styles.sectionTitle}>Acciones rápidas</Text>
           <View style={styles.actionGrid}>
             <QuickActionButton
               icon={
@@ -417,7 +416,7 @@ const DriverDashboard = () => {
         {/* Student List */}
         {isTripActive && (
           <View style={styles.studentList}>
-            <Text style={styles.sectionTitle}>Ruta Actual</Text>
+            <Text style={styles.sectionTitle}>Ruta actual</Text>
             {students
               .filter((student) => student.status === "waiting")
               .map((student) => (

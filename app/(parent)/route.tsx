@@ -9,38 +9,38 @@ const RouteScreen = () => {
   const routeInfo = {
     pickup: {
       time: '7:30 AM',
-      location: '123 Main Street, Santo Domingo',
-      status: 'On Time',
+      location: 'Calle Principal #123, Santo Domingo',
+      status: 'A Tiempo',
     },
     dropoff: {
       time: '8:15 AM',
-      location: 'Santo Domingo High School',
-      status: 'Scheduled',
+      location: 'Escuela Santo Domingo',
+      status: 'Programado',
     },
     stops: [
       {
         time: '7:30 AM',
-        location: '123 Main Street',
-        type: 'Pickup',
-        status: 'Completed',
+        location: 'Calle Principal #123',
+        type: 'Recogida',
+        status: 'Completado',
       },
       {
         time: '7:45 AM',
-        location: '456 Park Avenue',
-        type: 'Pickup',
-        status: 'In Progress',
+        location: 'Calle Roble #456',
+        type: 'Recogida',
+        status: 'En Progreso',
       },
       {
         time: '8:00 AM',
-        location: '789 School Road',
-        type: 'Pickup',
-        status: 'Pending',
+        location: 'Calle Roble #456',
+        type: 'Recogida',
+        status: 'Pendiente',
       },
       {
         time: '8:15 AM',
-        location: 'Santo Domingo High School',
-        type: 'Dropoff',
-        status: 'Pending',
+        location: 'Escuela Santo Domingo',
+        type: 'Entrega',
+        status: 'Pendiente',
       },
     ],
   };
@@ -51,17 +51,17 @@ const RouteScreen = () => {
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <MaterialIcons name="arrow-back" size={24} color="#4a90e2" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-800">Route Details</Text>
+        <Text className="text-xl font-bold text-gray-800">Detalles de la Ruta</Text>
       </View>
 
       <ScrollView className="flex-1">
         {/* Route Summary */}
         <View className="bg-white mx-4 my-4 p-4 rounded-xl shadow-sm">
-          <Text className="text-lg font-bold text-gray-800 mb-4">Route Summary</Text>
+          <Text className="text-lg font-bold text-gray-800 mb-4">Resumen de la Ruta</Text>
           <View className="space-y-4">
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-gray-600">Pickup Time</Text>
+                <Text className="text-gray-600">Hora de Recogida</Text>
                 <Text className="text-lg font-semibold">{routeInfo.pickup.time}</Text>
               </View>
               <View className="bg-green-100 px-3 py-1 rounded-full">
@@ -70,7 +70,7 @@ const RouteScreen = () => {
             </View>
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-gray-600">Dropoff Time</Text>
+                <Text className="text-gray-600">Hora de Entrega</Text>
                 <Text className="text-lg font-semibold">{routeInfo.dropoff.time}</Text>
               </View>
               <View className="bg-blue-100 px-3 py-1 rounded-full">
@@ -82,13 +82,13 @@ const RouteScreen = () => {
 
         {/* Stops */}
         <View className="bg-white mx-4 my-4 p-4 rounded-xl shadow-sm">
-          <Text className="text-lg font-bold text-gray-800 mb-4">Stops</Text>
+          <Text className="text-lg font-bold text-gray-800 mb-4">Paradas</Text>
           <View className="space-y-4">
             {routeInfo.stops.map((stop, index) => (
               <View key={index} className="flex-row items-start">
                 <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-3">
                   <MaterialIcons
-                    name={stop.type === 'Pickup' ? 'person-add' : 'school'}
+                    name={stop.type === 'Recogida' ? 'person-add' : 'school'}
                     size={20}
                     color="#4a90e2"
                   />
@@ -100,13 +100,13 @@ const RouteScreen = () => {
                       <Text className="text-sm text-gray-600">{stop.time}</Text>
                     </View>
                     <View className={`px-2 py-1 rounded-full ${
-                      stop.status === 'Completed' ? 'bg-green-100' :
-                      stop.status === 'In Progress' ? 'bg-blue-100' :
+                      stop.status === 'Completado' ? 'bg-green-100' :
+                      stop.status === 'En Progreso' ? 'bg-blue-100' :
                       'bg-gray-100'
                     }`}>
                       <Text className={`text-sm font-medium ${
-                        stop.status === 'Completed' ? 'text-green-600' :
-                        stop.status === 'In Progress' ? 'text-blue-600' :
+                        stop.status === 'Completado' ? 'text-green-600' :
+                        stop.status === 'En Progreso' ? 'text-blue-600' :
                         'text-gray-600'
                       }`}>
                         {stop.status}
